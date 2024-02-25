@@ -44,20 +44,27 @@ public class JobVacancyController {
     @RequestMapping("/vacancies")
     public ModelAndView listVacancies(){
         ModelAndView mv = new ModelAndView("vacancy/listVacancy");
-        Iterable<JobVacancy>vacancies = jobVacancyRepository.findAll();
+        Iterable<JobVacancy> vacancies = jobVacancyRepository.findAll();
         mv.addObject("vacancies", vacancies);
         return mv;
     }
     
     @RequestMapping(value = "/{code}", method = RequestMethod.GET)
     public ModelAndView detailsVacancy(@PathVariable("code") Long code){
-    	JobVacancy jobVacancy = jobVacancyRepository.findByCode(code);
+    	JobVacancy vacancy = jobVacancyRepository.findByCode(code);
         ModelAndView mv = new ModelAndView("vacancy/detailsVacancy");
-        mv.addObject("jobVacancy", jobVacancy);
+        mv.addObject("vacancy", vacancy);
 
-        Iterable<Candidate> candidates = candidateRepository.findByVacancy(jobVacancy);
+        Iterable<Candidate> candidates = candidateRepository.findByVacancy(vacancy);
         mv.addObject("candidates", candidates);
 
         return mv;
+    }
+    
+    @RequestMapping("/deleteVacancy")
+    public String deleteVacancy(Long code){
+    	JobVacancy vacancy = jobVacancyRepository.findByCode(code);
+    	jobVacancyRepository.delete(vacancy);
+        return "redirect:/vacancies";
     }
 }
