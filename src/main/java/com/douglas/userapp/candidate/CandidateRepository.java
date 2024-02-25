@@ -7,4 +7,6 @@ import com.douglas.userapp.jobvacancy.JobVacancy;
 public interface CandidateRepository extends JpaRepository<Candidate, Long>{
 
 	Iterable<Candidate> findByVacancy(JobVacancy jobVacancy);
+
+	Candidate findByRg(String rg);
 }
