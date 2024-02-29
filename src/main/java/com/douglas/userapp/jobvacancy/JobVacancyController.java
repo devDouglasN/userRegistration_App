@@ -68,8 +68,8 @@ public class JobVacancyController {
 		return "redirect:/vacancies";
 	}
 
-	public String detalhesVagaPost(@PathVariable("code") Long code, @Valid Candidate candidate,
-			BindingResult result, RedirectAttributes attributes) {
+	public String vacancyDetails(@PathVariable("code") Long code, @Valid Candidate candidate, BindingResult result,
+			RedirectAttributes attributes) {
 
 		if (result.hasErrors()) {
 			attributes.addFlashAttribute("message", "Verifique os campos");
@@ -84,5 +84,23 @@ public class JobVacancyController {
 		candidateRepository.save(candidate);
 		attributes.addFlashAttribute("message", "Candidato adicionado com sucesso!");
 		return "redirect:/{code}";
+	}
+
+	@RequestMapping(value = "/edit-vacancy", method = RequestMethod.GET)
+	public ModelAndView editVacancy(Long code) {
+		JobVacancy vacancy = jobVacancyRepository.findByCode(code);
+		ModelAndView mv = new ModelAndView("vacancy/update-vacancy");
+		mv.addObject("vacancy", vacancy);
+		return mv;
+	}
+
+	@RequestMapping(value = "/edit-vacancy", method = RequestMethod.POST)
+	public String updateVaga(@Valid JobVacancy vacancy, BindingResult result, RedirectAttributes attributes) {
+		jobVacancyRepository.save(vacancy);
+		attributes.addFlashAttribute("success", "Vaga alterada com sucesso!");
+
+		long codeLong = vacancy.getCode();
+		String code = "" + codeLong;
+		return "redirect:/" + code;
 	}
 }
