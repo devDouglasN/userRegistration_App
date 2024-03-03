@@ -32,6 +32,6 @@ public class JobVacancy {
 	private String date;
 	private String salary;
 
-	@OneToMany(mappedBy = "jobVacancy", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "vacancy", cascade = CascadeType.REMOVE)
 	private List<Candidate> candidate;
 }
