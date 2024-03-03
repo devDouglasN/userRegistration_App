@@ -39,5 +39,5 @@ public class Candidate {
 	private String email;
 	
 	@ManyToOne
-	private JobVacancy jobVacancy;
+	private JobVacancy vacancy;
 }
