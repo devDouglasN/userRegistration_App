@@ -1,106 +1,74 @@
 package com.douglas.userapp.jobvacancy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.douglas.userapp.candidate.Candidate;
-import com.douglas.userapp.candidate.CandidateRepository;
 
 import jakarta.validation.Valid;
 
-@RestController
+@Controller
 public class JobVacancyController {
 
 	@Autowired
-	private JobVacancyRepository jobVacancyRepository;
+	private JobVacancyService jobVacancyService;
 
-	@Autowired
-	private CandidateRepository candidateRepository;
+	@GetMapping("/registerVacancy")
+    public String formVaga() {
+        return "vacancy/formVacancy";
+    }
 
-	@RequestMapping(value = "/registerVacancy", method = RequestMethod.GET)
-	public String form() {
-		return "jobVacancy/formJobVacancy.html";
-	}
+    @PostMapping("/registerVacancy")
+    public String registerVacancy(@Valid JobVacancy vacancy, BindingResult result, RedirectAttributes attributes) {
+        return jobVacancyService.registerVacancy(vacancy, result, attributes);
+    }
 
-	@RequestMapping(value = "/registerVacancy", method = RequestMethod.POST)
-	public String form(@Valid JobVacancy jobVacancy, BindingResult result, RedirectAttributes attributes) {
+    @GetMapping("/vacancies")
+    public ModelAndView listVacancy() {
+        ModelAndView mv = new ModelAndView("vacancy/listVacancy");
+        mv.addObject("vacancys", jobVacancyService.listVacancies());
+        return mv;
+    }
 
-		if (result.hasErrors()) {
-			attributes.addFlashAttribute("message", "Verifique os campos...");
-			return "redirect:/registerVacancy";
-		}
-		jobVacancyRepository.save(jobVacancy);
-		attributes.addFlashAttribute("message", "Vaga cadastrada com sucesso!");
+    @GetMapping("/{code}")
+    public ModelAndView detailsVacancy(@PathVariable("code") Long code) {
+        ModelAndView mv = new ModelAndView("vacancy/detailsVacancy");
+        mv.addObject("vacancys", jobVacancyService.detailsVacancy(code));
+        mv.addObject("candidates", jobVacancyService.detailsVacancy(code).getCandidate());
+        return mv;
+    }
 
-		return "redirect:/registerVacancy";
-	}
+    @PostMapping("/{code}")
+    public String addCandidate(@PathVariable("code") Long code, @Valid Candidate candidate,
+                               BindingResult result, RedirectAttributes attributes) {
+        return jobVacancyService.addCandidate(code, candidate, result, attributes);
+    }
 
-	@RequestMapping("/vacancies")
-	public ModelAndView listVacancies() {
-		ModelAndView mv = new ModelAndView("vacancy/listVacancy");
-		Iterable<JobVacancy> vacancies = jobVacancyRepository.findAll();
-		mv.addObject("vacancies", vacancies);
-		return mv;
-	}
+    @GetMapping("/deleteVacancy")
+    public String deleteVacancy(Long code) {
+        return jobVacancyService.deleteVacancy(code);
+    }
 
-	@RequestMapping(value = "/{code}", method = RequestMethod.GET)
-	public ModelAndView detailsVacancy(@PathVariable("code") Long code) {
-		JobVacancy vacancy = jobVacancyRepository.findByCode(code);
-		ModelAndView mv = new ModelAndView("vacancy/detailsVacancy");
-		mv.addObject("vacancy", vacancy);
+    @GetMapping("/deleteCandidate")
+    public String deleteCandidate(String rg) {
+        return jobVacancyService.deleteCandidate(rg);
+    }
 
-		Iterable<Candidate> candidates = candidateRepository.findByVacancy(vacancy);
-		mv.addObject("candidates", candidates);
+    @GetMapping("/edit-vacancy")
+    public ModelAndView editVacancy(Long code) {
+        ModelAndView mv = new ModelAndView("vacancy/update-vacancy");
+        mv.addObject("vacancy", jobVacancyService.editVacancy(code));
+        return mv;
+    }
 
-		return mv;
-	}
-
-	@RequestMapping("/deleteVacancy")
-	public String deleteVacancy(Long code) {
-		JobVacancy vacancy = jobVacancyRepository.findByCode(code);
-		jobVacancyRepository.delete(vacancy);
-		return "redirect:/vacancies";
-	}
-
-	public String vacancyDetails(@PathVariable("code") Long code, @Valid Candidate candidate, BindingResult result,
-			RedirectAttributes attributes) {
-
-		if (result.hasErrors()) {
-			attributes.addFlashAttribute("message", "Verifique os campos");
-			return "redirect:/{codigo}";
-		}
-		if (candidateRepository.findByRg(candidate.getRg()) != null) {
-			attributes.addFlashAttribute("mensagem erro", "RG duplicado");
-			return "redirect:/{codigo}";
-		}
-		JobVacancy vacancy = jobVacancyRepository.findByCode(code);
-		candidate.setJobVacancy(vacancy);
-		candidateRepository.save(candidate);
-		attributes.addFlashAttribute("message", "Candidato adicionado com sucesso!");
-		return "redirect:/{code}";
-	}
-
-	@RequestMapping(value = "/edit-vacancy", method = RequestMethod.GET)
-	public ModelAndView editVacancy(Long code) {
-		JobVacancy vacancy = jobVacancyRepository.findByCode(code);
-		ModelAndView mv = new ModelAndView("vacancy/update-vacancy");
-		mv.addObject("vacancy", vacancy);
-		return mv;
-	}
-
-	@RequestMapping(value = "/edit-vacancy", method = RequestMethod.POST)
-	public String updateVaga(@Valid JobVacancy vacancy, BindingResult result, RedirectAttributes attributes) {
-		jobVacancyRepository.save(vacancy);
-		attributes.addFlashAttribute("success", "Vaga alterada com sucesso!");
-
-		long codeLong = vacancy.getCode();
-		String code = "" + codeLong;
-		return "redirect:/" + code;
-	}
+    @PostMapping("/edit-vacancy")
+    public String updateVaga(@Valid JobVacancy vacancy, BindingResult result, RedirectAttributes attributes) {
+        return jobVacancyService.updateVacancy(vacancy, result, attributes);
+    }
 }
