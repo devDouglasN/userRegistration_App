@@ -1,6 +1,6 @@
 # Sobre o projeto 
 ## 👨‍💼 User Register App
-User Registration App é uma plataforma para cadastro, alteração e seleção de candidatos para vagas de emprego. Eficiente para o processo de recrutamento, permitindo organizar registros de candidatos ideais de forma rápida e organizada.
+User Registration App é uma aplicação web para cadastro, alteração e seleção de candidatos para vagas de emprego. Eficiente para o processo de recrutamento, permitindo organizar registros de candidatos ideais de forma rápida e organizada.
 
 <br>
 
@@ -10,7 +10,10 @@ User Registration App é uma plataforma para cadastro, alteração e seleção d
 
 
 
-https://github.com/devDouglasN/userRegistration_App/assets/122110326/89be1079-dc16-4e85-ab25-0ad8317c03a3
+
+https://github.com/devDouglasN/userRegistration_App/assets/122110326/f6e2f235-2dc1-4180-9486-32e45f61575a
+
+
 
 
 
